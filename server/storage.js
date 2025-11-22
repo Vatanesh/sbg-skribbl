@@ -12,19 +12,20 @@ class Storage {
     }
 
     async init(redisUrl) {
-        this.pubClient = createClient({ url: redisUrl });
-        this.pubClient.on('error', (err) => {
-            console.error('Redis Client Error', err);
-            this.isRedisConnected = false;
-        });
-
         try {
+            this.pubClient = createClient({ url: redisUrl });
+            this.pubClient.on('error', (err) => {
+                console.error('Redis Client Error', err);
+                this.isRedisConnected = false;
+            });
+
             await this.pubClient.connect();
             this.isRedisConnected = true;
             console.log('✅ Connected to Redis successfully');
         } catch (err) {
             console.error('❌ Redis connection failed, using in-memory storage:', err.message);
             this.isRedisConnected = false;
+            this.pubClient = null;
         }
         return this.pubClient;
     }
